@@ -38,15 +38,13 @@ RUN	apt-get update && \
 	mkdir -p /usr/local/include && \
 	mkdir -p /usr/local/include/mtd
 
-ENV BUILD_THREADS 4
-
 ENV MTD_UTILS_URL https://github.com/jneuhauser/mtd-utils/archive/v2.0.2.tar.gz
 RUN	wget -O mtd-utils_dl.tar.gz $MTD_UTILS_URL && \
 	tar xf mtd-utils_dl.tar.gz && \
 	cd mtd-utils-* && \
 	./autogen.sh && \
 	./configure && \
-	make -j$BUILD_THREADS && \
+	make -j$(nproc) && \
 	install -m 644 include/libubi.h /usr/local/include/mtd && \
 	install -m 644 include/libmtd.h /usr/local/include/mtd && \
 	install -m 644 include/mtd/ubi-media.h /usr/local/include/mtd && \
@@ -60,7 +58,7 @@ RUN	wget -O efibootguard_dl.tar.gz $EFIBOOTGUARD_URL && \
 	cd efibootguard-* && \
 	autoreconf -fi && \
 	./configure && \
-	make -j$BUILD_THREADS libebgenv.a && \
+	make -j$(nproc) libebgenv.a && \
 	install -m 644 libebgenv.a /usr/local/lib/libebgenv.a && \
 	install -m 755 -d /usr/include/efibootguard && \
 	install -m 644 include/ebgenv.h /usr/include/efibootguard/ebgenv.h && \
@@ -72,7 +70,7 @@ RUN	wget -O u-boot_dl.tar.gz $UBOOT_URL && \
 	tar xf u-boot_dl.tar.gz && \
 	cd u-boot-* && \
 	make dh_imx6_defconfig && \
-	make -j$BUILD_THREADS envtools && \
+	make -j$(nproc) envtools && \
 	install -m 644 tools/env/lib.a /usr/local/lib/libubootenv.a && \
 	install -m 755 tools/env/fw_printenv /usr/local/bin/fw_printenv && \
 	ln -sr /usr/local/bin/fw_printenv /usr/local/bin/fw_setenv && \
