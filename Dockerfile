@@ -1,4 +1,4 @@
-FROM arm32v7/debian:jessie
+FROM arm32v7/debian:stretch
 
 # make arm32v7 container runable on x86
 COPY qemu-arm-static /usr/bin
@@ -14,7 +14,7 @@ RUN	apt-get update && \
 		liblua5.2-dev \
 		libconfig-dev \
 		libarchive-dev \
-		libjson0-dev \
+		libjson-c-dev \
 		zlib1g-dev \
 		libncursesw5-dev \
 		libncurses5-dev \
@@ -22,8 +22,7 @@ RUN	apt-get update && \
 		uuid \
 		uuid-dev \
 		liblzo2-dev \
-		libsystemd-daemon-dev \
-		libsystemd-daemon0 \
+		libsystemd-dev \
 		check \
 		bison \
 		flex \
