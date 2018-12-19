@@ -79,5 +79,15 @@ RUN	wget -O u-boot_dl.tar.gz $UBOOT_URL && \
 
 COPY	executables_with_so_to_tar.sh /usr/local/bin/executables_with_so_to_tar
 
+ARG DEBIAN_PACKAGE
+RUN	if [ "$DEBIAN_PACKAGE" = "y" ]; then \
+		apt-get -y install --no-install-recommends \
+			python3-sphinx \
+			texlive-latex-base \
+			texlive-generic-extra \
+			texlive-fonts-recommended \
+			texlive-latex-extra ; \
+	fi
+
 WORKDIR /swupdate
 ENTRYPOINT ["/bin/bash"]
