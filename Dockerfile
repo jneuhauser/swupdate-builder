@@ -37,6 +37,17 @@ RUN	apt-get update && \
 	mkdir -p /usr/local/include && \
 	mkdir -p /usr/local/include/mtd
 
+# install needed packages for man/doc in debian package
+ARG DEBIAN_PACKAGE=y
+RUN	if [ "$DEBIAN_PACKAGE" = "y" ]; then \
+		apt-get -y install --no-install-recommends \
+			python3-sphinx \
+			texlive-latex-base \
+			texlive-generic-extra \
+			texlive-fonts-recommended \
+			texlive-latex-extra ; \
+	fi
+
 ENV MTD_UTILS_URL https://github.com/jneuhauser/mtd-utils/archive/v2.0.2.tar.gz
 RUN	wget -O mtd-utils_dl.tar.gz $MTD_UTILS_URL && \
 	tar xf mtd-utils_dl.tar.gz && \
@@ -77,16 +88,6 @@ RUN	wget -O u-boot_dl.tar.gz $UBOOT_URL && \
 	rm -rf u-boot*
 
 COPY	executables_with_so_to_tar.sh /usr/local/bin/executables_with_so_to_tar
-
-ARG DEBIAN_PACKAGE
-RUN	if [ "$DEBIAN_PACKAGE" = "y" ]; then \
-		apt-get -y install --no-install-recommends \
-			python3-sphinx \
-			texlive-latex-base \
-			texlive-generic-extra \
-			texlive-fonts-recommended \
-			texlive-latex-extra ; \
-	fi
 
 WORKDIR /swupdate
 ENTRYPOINT ["/bin/bash"]
