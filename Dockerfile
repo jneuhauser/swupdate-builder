@@ -80,7 +80,11 @@ RUN	wget -O u-boot_dl.tar.gz $UBOOT_URL && \
 COPY	executables_with_so_to_tar.sh /usr/local/bin/executables_with_so_to_tar
 
 ARG DEBIAN_PACKAGE
+# we need debhelper from jessie-backports because compat level is 11 in swupdate
 RUN	if [ "$DEBIAN_PACKAGE" = "y" ]; then \
+		echo "deb http://deb.debian.org/debian jessie-backports main" >> /etc/apt/sources.list && \
+		apt-get update && \
+		apt-get -y -t jessie-backports install debhelper && \
 		apt-get -y install --no-install-recommends \
 			python3-sphinx \
 			texlive-latex-base \
