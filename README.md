@@ -2,7 +2,7 @@
 
 https://hub.docker.com/r/jneuhauser/swupdate-builder/
 
-## run armhf container on non armhf host
+## run non host arch containers
 
 https://hub.docker.com/r/multiarch/qemu-user-static
 
@@ -13,13 +13,13 @@ https://hub.docker.com/r/multiarch/qemu-user-static
 
 ### build container
 ```
-FLAVOR=stretch
+FLAVOR=armhf-stretch
 docker build -t jneuhauser/swupdate-builder:${FLAVOR} -f Dockerfile.${FLAVOR} .
 ```
 
 ### build container with the same proxy as from host
 ```
-FLAVOR=stretch
+FLAVOR=armhf-stretch
 docker build --build-arg HTTP_PROXY --build-arg HTTPS_PROXY --build-arg http_proxy --build-arg https_proxy -t jneuhauser/swupdate-builder:${FLAVOR} -f Dockerfile.${FLAVOR} .
 ```
 
@@ -27,14 +27,14 @@ docker build --build-arg HTTP_PROXY --build-arg HTTPS_PROXY --build-arg http_pro
 
 ### run container
 ```
-FLAVOR=stretch
+FLAVOR=armhf-stretch
 cd ${WORKDIR}
 docker run --rm -i -t -v $(pwd):/swupdate jneuhauser/swupdate-builder:${FLAVOR}
 ```
 
 ### run container with the same proxy as from host
 ```
-FLAVOR=stretch
+FLAVOR=armhf-stretch
 cd ${WORKDIR}
 docker run -e HTTP_PROXY -e HTTPS_PROXY -e http_proxy -e https_proxy --rm -i -t -v $(pwd):/swupdate jneuhauser/swupdate-builder:${FLAVOR}
 ```
