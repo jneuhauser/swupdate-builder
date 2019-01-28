@@ -1,7 +1,4 @@
-FROM arm32v7/debian:stretch
-
-# make arm32v7 container runable on x86
-COPY qemu-arm-static /usr/bin
+FROM multiarch/debian-debootstrap:armhf-jessie
 
 # install needed packages
 RUN	apt-get update && \
@@ -14,7 +11,7 @@ RUN	apt-get update && \
 		liblua5.2-dev \
 		libconfig-dev \
 		libarchive-dev \
-		libjson-c-dev \
+		libjson0-dev \
 		zlib1g-dev \
 		libncursesw5-dev \
 		libncurses5-dev \
@@ -22,7 +19,8 @@ RUN	apt-get update && \
 		uuid \
 		uuid-dev \
 		liblzo2-dev \
-		libsystemd-dev \
+		libsystemd-daemon-dev \
+		libsystemd-daemon0 \
 		check \
 		bison \
 		flex \
@@ -39,7 +37,11 @@ RUN	apt-get update && \
 
 # install needed packages for man/doc in debian package
 ARG DEBIAN_PACKAGE=y
+# we need debhelper from jessie-backports because compat level is 11 in swupdate
 RUN	if [ "$DEBIAN_PACKAGE" = "y" ]; then \
+		echo "deb http://deb.debian.org/debian jessie-backports main" >> /etc/apt/sources.list && \
+		apt-get update && \
+		apt-get -y -t jessie-backports install debhelper && \
 		apt-get -y install --no-install-recommends \
 			python3-sphinx \
 			texlive-latex-base \

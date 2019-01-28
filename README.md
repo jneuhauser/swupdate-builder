@@ -2,21 +2,42 @@
 
 https://hub.docker.com/r/jneuhauser/swupdate-builder/
 
+## run armhf container on non armhf host
+
+https://hub.docker.com/r/multiarch/qemu-user-static
+
+### Register qemu-*-static for all supported processors except the current one
+`docker run --rm --privileged multiarch/qemu-user-static:register --reset`
+
 ## build conatiner
 
 ### build container
-`docker build . -t jneuhauser/swupdate-builder:stretch`
+```
+FLAVOR=stretch
+docker build -t jneuhauser/swupdate-builder:${FLAVOR} -f Dockerfile.${FLAVOR} .
+```
 
 ### build container with the same proxy as from host
-`docker build --build-arg HTTP_PROXY --build-arg HTTPS_PROXY --build-arg http_proxy --build-arg https_proxy . -t jneuhauser/swupdate-builder:stretch`
+```
+FLAVOR=stretch
+docker build --build-arg HTTP_PROXY --build-arg HTTPS_PROXY --build-arg http_proxy --build-arg https_proxy -t jneuhauser/swupdate-builder:${FLAVOR} -f Dockerfile.${FLAVOR} .
+```
 
-## use container to build swupdate in local host dir
+## use container to build swupdate in persistent host dir
 
 ### run container
-`docker run -i -t -v $(pwd):/swupdate jneuhauser/swupdate-builder:stretch`
+```
+FLAVOR=stretch
+cd ${WORKDIR}
+docker run --rm -i -t -v $(pwd):/swupdate jneuhauser/swupdate-builder:${FLAVOR}
+```
 
 ### run container with the same proxy as from host
-`docker run -e HTTP_PROXY -e HTTPS_PROXY -e http_proxy -e https_proxy -i -t -v $(pwd):/swupdate jneuhauser/swupdate-builder:stretch`
+```
+FLAVOR=stretch
+cd ${WORKDIR}
+docker run -e HTTP_PROXY -e HTTPS_PROXY -e http_proxy -e https_proxy --rm -i -t -v $(pwd):/swupdate jneuhauser/swupdate-builder:${FLAVOR}
+```
 
 ## build swupdate from within container in local host dir
 
