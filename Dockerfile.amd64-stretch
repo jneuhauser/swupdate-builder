@@ -1,0 +1,90 @@
+FROM multiarch/debian-debootstrap:amd64-stretch
+
+# install needed packages
+RUN	apt-get update && \
+	apt-get -y dist-upgrade && \
+	apt-get -y install \
+		build-essential \
+		automake \
+		libzmq3-dev \
+		libcurl4-openssl-dev \
+		liblua5.2-dev \
+		libconfig-dev \
+		libarchive-dev \
+		libjson-c-dev \
+		zlib1g-dev \
+		libncursesw5-dev \
+		libncurses5-dev \
+		git \
+		uuid \
+		uuid-dev \
+		liblzo2-dev \
+		libsystemd-dev \
+		check \
+		bison \
+		flex \
+		libssl-dev \
+		fakeroot \
+		devscripts \
+		wget \
+		nano \
+		pax-utils && \
+	ln -sf /usr/lib/x86_64-linux-gnu/pkgconfig/lua5.2.pc /usr/lib/x86_64-linux-gnu/pkgconfig/lua.pc && \
+	mkdir -p /usr/local/lib && \
+	mkdir -p /usr/local/include && \
+	mkdir -p /usr/local/include/mtd
+
+# install needed packages for man/doc in debian package
+ARG DEBIAN_PACKAGE=y
+RUN	if [ "$DEBIAN_PACKAGE" = "y" ]; then \
+		apt-get -y install --no-install-recommends \
+			python3-sphinx \
+			texlive-latex-base \
+			texlive-generic-extra \
+			texlive-fonts-recommended \
+			texlive-latex-extra ; \
+	fi
+
+ENV MTD_UTILS_URL https://github.com/jneuhauser/mtd-utils/archive/v2.0.2.tar.gz
+RUN	wget -O mtd-utils_dl.tar.gz $MTD_UTILS_URL && \
+	tar xf mtd-utils_dl.tar.gz && \
+	cd mtd-utils-* && \
+	./autogen.sh && \
+	./configure && \
+	make -j$(nproc) && \
+	install -m 644 include/libubi.h /usr/local/include/mtd && \
+	install -m 644 include/libmtd.h /usr/local/include/mtd && \
+	install -m 644 include/mtd/ubi-media.h /usr/local/include/mtd && \
+	install -m 644 *.a /usr/local/lib && \
+	cd .. && \
+	rm -rf mtd-utils*
+
+ENV EFIBOOTGUARD_URL https://github.com/jneuhauser/efibootguard/archive/v0.4.tar.gz
+RUN	wget -O efibootguard_dl.tar.gz $EFIBOOTGUARD_URL && \
+	tar xf efibootguard_dl.tar.gz && \
+	cd efibootguard-* && \
+	autoreconf -fi && \
+	./configure && \
+	make -j$(nproc) libebgenv.a && \
+	install -m 644 libebgenv.a /usr/local/lib/libebgenv.a && \
+	install -m 755 -d /usr/include/efibootguard && \
+	install -m 644 include/ebgenv.h /usr/include/efibootguard/ebgenv.h && \
+	cd .. && \
+	rm -rf efibootguard*
+
+ENV UBOOT_URL https://github.com/u-boot/u-boot/archive/v2019.01.tar.gz
+RUN	wget -O u-boot_dl.tar.gz $UBOOT_URL && \
+	tar xf u-boot_dl.tar.gz && \
+	cd u-boot-* && \
+	make sandbox64_defconfig && \
+	make -j$(nproc) envtools && \
+	install -m 644 tools/env/lib.a /usr/local/lib/libubootenv.a && \
+	install -m 755 tools/env/fw_printenv /usr/local/bin/fw_printenv && \
+	ln -sr /usr/local/bin/fw_printenv /usr/local/bin/fw_setenv && \
+	cd .. && \
+	rm -rf u-boot*
+
+COPY	executables_with_so_to_tar.sh /usr/local/bin/executables_with_so_to_tar
+
+WORKDIR /swupdate
+ENTRYPOINT ["/bin/bash"]
