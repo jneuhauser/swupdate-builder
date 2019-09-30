@@ -1,0 +1,82 @@
+before_script:
+  - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+
+amd64-stretch-master:
+  stage: build
+  variables:
+    FLAVOR: 'amd64-stretch'
+  script:
+    - docker build --pull -t "$CI_REGISTRY_IMAGE:${FLAVOR}-latest" -f Dockerfile.${FLAVOR} .
+    - docker push "$CI_REGISTRY_IMAGE:${FLAVOR}-latest"
+  only:
+    - master
+
+amd64-stretch:
+  stage: build
+  variables:
+    FLAVOR: 'amd64-stretch'
+  script:
+    - docker build --pull -t "$CI_REGISTRY_IMAGE:${FLAVOR}-$CI_COMMIT_REF_SLUG" -f Dockerfile.${FLAVOR} .
+    - docker push "$CI_REGISTRY_IMAGE:${FLAVOR}-$CI_COMMIT_REF_SLUG"
+  except:
+    - master
+
+amd64-jessie-master:
+  stage: build
+  variables:
+    FLAVOR: 'amd64-jessie'
+  script:
+    - docker build --pull -t "$CI_REGISTRY_IMAGE:${FLAVOR}-latest" -f Dockerfile.${FLAVOR} .
+    - docker push "$CI_REGISTRY_IMAGE:${FLAVOR}-latest"
+  only:
+    - master
+
+amd64-jessie:
+  stage: build
+  variables:
+    FLAVOR: 'amd64-jessie'
+  script:
+    - docker build --pull -t "$CI_REGISTRY_IMAGE:${FLAVOR}-$CI_COMMIT_REF_SLUG" -f Dockerfile.${FLAVOR} .
+    - docker push "$CI_REGISTRY_IMAGE:${FLAVOR}-$CI_COMMIT_REF_SLUG"
+  except:
+    - master
+
+armhf-stretch-master:
+  stage: build
+  variables:
+    FLAVOR: 'armhf-stretch'
+  script:
+    - docker build --pull -t "$CI_REGISTRY_IMAGE:${FLAVOR}-latest" -f Dockerfile.${FLAVOR} .
+    - docker push "$CI_REGISTRY_IMAGE:${FLAVOR}-latest"
+  only:
+    - master
+
+armhf-stretch:
+  stage: build
+  variables:
+    FLAVOR: 'armhf-stretch'
+  script:
+    - docker build --pull -t "$CI_REGISTRY_IMAGE:${FLAVOR}-$CI_COMMIT_REF_SLUG" -f Dockerfile.${FLAVOR} .
+    - docker push "$CI_REGISTRY_IMAGE:${FLAVOR}-$CI_COMMIT_REF_SLUG"
+  except:
+    - master
+
+armhf-jessie-master:
+  stage: build
+  variables:
+    FLAVOR: 'armhf-jessie'
+  script:
+    - docker build --pull -t "$CI_REGISTRY_IMAGE:${FLAVOR}-latest" -f Dockerfile.${FLAVOR} .
+    - docker push "$CI_REGISTRY_IMAGE:${FLAVOR}-latest"
+  only:
+    - master
+
+armhf-jessie:
+  stage: build
+  variables:
+    FLAVOR: 'armhf-jessie'
+  script:
+    - docker build --pull -t "$CI_REGISTRY_IMAGE:${FLAVOR}-$CI_COMMIT_REF_SLUG" -f Dockerfile.${FLAVOR} .
+    - docker push "$CI_REGISTRY_IMAGE:${FLAVOR}-$CI_COMMIT_REF_SLUG"
+  except:
+    - master
